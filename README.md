@@ -35,7 +35,7 @@ The architecture of LinkMind combines LangChain’s modular framework with Strea
 1. **Clone the Repository:**
 
    ```
-   git clone https://github.com/cricsion/LinkMind
+   git clone https://github.com/cricsion/LinkMind.git
    cd LinkMind
    ```
 
