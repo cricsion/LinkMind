@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-from langchain_huggingface import (ChatHuggingFace, HuggingFaceEndpoint,)
 from langchain.agents import (Tool, AgentExecutor, create_react_agent,)
 from langchain.memory import ConversationBufferMemory
 from langchain import hub
@@ -11,6 +10,17 @@ from tools.data import fetch_model
 import asyncio
 from langchain.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
+import logging
+from typing import Dict, Any, Optional, List, Union
+import uuid
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Set up an in-memory cache to optimize LLM calls
 set_llm_cache(InMemoryCache())
@@ -20,8 +30,7 @@ load_dotenv()
 
 # Retrieve model identifier and Hugging Face API token from env variables and log in
 MODEL = os.environ["MODEL"]
-HUGGINGFACEHUB_API_TOKEN = os.environ["HUGGINGFACEHUB_API_TOKEN"]
-login(token=HUGGINGFACEHUB_API_TOKEN)
+GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 
 # Initialize conversation memory to maintain chat context
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key='output')
@@ -56,18 +65,15 @@ tools = [
     ),
 ]
 
-# Initialize the Hugging Face endpoint LLM with specified parameters
-llm = HuggingFaceEndpoint(
-    repo_id=MODEL,
-    task="text-generation",
-    max_new_tokens=2048,
-    temperature=0.1,
-    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
-    truncate=30000
-)
-
 # Wrap the LLM into a chat model expecting JSON formatted output
-chat_model = ChatHuggingFace(llm=llm, format="json")
+chat_model = ChatGoogleGenerativeAI(
+    model=MODEL,
+    temperature=0.1,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+    google_api_key=GOOGLE_API_KEY,
+)
 
 # Create a React-based agent that integrates the chat model, prompt, and defined tools
 rag_agent = create_react_agent(

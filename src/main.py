@@ -4,18 +4,18 @@ from agents.agent import rag_agent_executor, memory
 import datetime
 import asyncio
 from streamlit import dialog as st_dialog
+import time
 
 # Enable detailed error messages in the Streamlit client console
 st.set_option("client.showErrorDetails", True)
 
 # Define the template for the assistant's prompt with current time and user question
 PROMPT_TEMPLATE = """
-    Answer the question in detail and explain it clearly, if you don't know the answer to the question, even after using the provided tool, state that you don't know the answer. 
+    Give a detailed answer to the question and explain the answer clearly, if you don't know the answer to the question, even after using the provided tool, state that you don't know the answer. 
+    Provide sources section if possible.
     Current Date and Time: {current_time}
     question: {question}
-
 """
-
 # Error recovery function; displays error and offers session reset
 @st_dialog("Error Recovery")
 def error_fallback(e):
@@ -59,8 +59,10 @@ async def main():
                     query = prompt_template.format(current_time=formatted_now, question=prompt)
 
                     # Invoke the agent asynchronously using version "v2"
+                    start=time.time();
                     response = await rag_agent_executor.ainvoke({"input": query}, version="v2")
-                    output_text = response["output"]
+                    total_time=round(time.time()-start);
+                    output_text = f"*Thought for {total_time} seconds*\n\n"+response["output"]
                 except Exception as e:
                     # On error, use fallback mechanism and set output_text to the error
                     output_text = e
@@ -72,4 +74,10 @@ async def main():
 
 # Run the main async function if this script is executed as the main module
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    if "loop" not in st.session_state:
+        st.session_state.loop = loop
+        
+    st.session_state.loop.run_until_complete(main())
