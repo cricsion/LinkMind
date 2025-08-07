@@ -1,7 +1,7 @@
 duckduckgo-search==8.1.1
 ddgs==9.5.2
 faiss-cpu==1.10.0
-huggingface-hub==0.33.0
+huggingface-hub==0.34.3
 langchain==0.3.27
 langchain-community==0.3.27
 langchain-core==0.3.73
