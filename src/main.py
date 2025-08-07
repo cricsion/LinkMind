@@ -25,7 +25,7 @@ def error_fallback(e):
         st.rerun()
 
 # Main asynchronous function for handling the chat interface and responses
-async def main():
+def main():
     # Configure page title and icon, and display the main title
     st.set_page_config(page_title="LinkMind", page_icon=":link::brain:")
     st.title(":link::brain: LinkMind")       
@@ -60,7 +60,7 @@ async def main():
 
                     # Invoke the agent asynchronously using version "v2"
                     start=time.time();
-                    response = await rag_agent_executor.ainvoke({"input": query}, version="v2")
+                    response = rag_agent_executor.invoke({"input": query}, version="v2")
                     total_time=round(time.time()-start);
                     output_text = f"*Thought for {total_time} seconds*\n\n"+response["output"]
                 except Exception as e:
@@ -74,10 +74,4 @@ async def main():
 
 # Run the main async function if this script is executed as the main module
 if __name__ == "__main__":
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    if "loop" not in st.session_state:
-        st.session_state.loop = loop
-        
-    st.session_state.loop.run_until_complete(main())
+    main()

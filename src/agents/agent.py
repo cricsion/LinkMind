@@ -28,7 +28,7 @@ set_llm_cache(InMemoryCache())
 # Load environment variables from .env file
 load_dotenv()
 
-# Retrieve model identifier and Hugging Face API token from env variables and log in
+# Retrieve model identifier and LLM API token from env variables and log in
 MODEL = os.environ["MODEL"]
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 
